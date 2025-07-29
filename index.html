@@ -2,208 +2,195 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Malla Curricular - Psicología UBA</title>
+  <title>Malla Curricular Psicología - Ibero</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
+      background: #ffe6f0;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      color: #880e4f;
       margin: 0;
       padding: 20px;
-      background: #f9f9f9;
-      color: #333;
     }
 
     h1 {
       text-align: center;
-      color: #2c3e50;
+      font-size: 2em;
+      margin-bottom: 30px;
     }
 
-    .malla {
-      display: flex;
-      flex-wrap: wrap;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
       gap: 20px;
-      justify-content: center;
     }
 
-    .semestre {
-      background: #ffffff;
-      border-radius: 8px;
-      padding: 15px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      width: 250px;
+    .semester {
+      background: #ffc1e3;
+      border-radius: 10px;
+      padding: 10px;
     }
 
-    .semestre h2 {
+    .semester h2 {
+      text-align: center;
       font-size: 1.2em;
-      margin-bottom: 10px;
-      color: #34495e;
+      border-bottom: 2px dashed #880e4f;
     }
 
-    .materia {
-      padding: 8px 10px;
-      margin-bottom: 8px;
-      border-radius: 5px;
-      background: #ecf0f1;
+    .subject {
+      background: #fff0f7;
+      margin: 8px 0;
+      padding: 8px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: background 0.2s;
-      position: relative;
+      border: 2px solid #880e4f;
+      transition: background 0.3s;
     }
 
-    .materia:hover {
-      background: #d0e4f0;
-    }
-
-    .materia.aprobada {
-      background: #a8e6cf;
+    .subject.completed {
+      background: #f8bbd0;
       text-decoration: line-through;
     }
 
-    .materia.bloqueada {
-      background: #f5b7b1;
+    .subject.locked {
+      background: #fce4ec;
       cursor: not-allowed;
       opacity: 0.6;
+      position: relative;
     }
 
-    .materia[title]:hover::after {
-      content: attr(title);
+    .subject.locked:hover::after {
+      content: attr(data-tooltip);
       position: absolute;
-      bottom: 100%;
-      left: 0;
-      background: #333;
-      color: #fff;
-      padding: 4px 6px;
-      border-radius: 4px;
-      font-size: 0.8em;
+      left: 100%;
+      top: 0;
+      background: #880e4f;
+      color: white;
+      padding: 5px;
+      border-radius: 5px;
       white-space: nowrap;
-      transform: translateY(-5px);
+      margin-left: 10px;
+      font-size: 0.8em;
+      z-index: 10;
     }
   </style>
 </head>
 <body>
-  <h1>Malla Curricular - Psicología UBA</h1>
-  <div class="malla" id="malla"></div>
+  <h1>Malla Curricular Psicología - IBERO</h1>
+  <div class="grid" id="malla"></div>
 
   <script>
-    const materias = [
-      { id: 'cat1', nombre: 'Cátedra 1', semestre: 1 },
-      { id: 'com', nombre: 'Competencias comunicativas', semestre: 1 },
-      { id: 'epis', nombre: 'Epistemología', semestre: 1 },
-      { id: 'mat', nombre: 'Matemáticas Básicas', semestre: 1 },
-      { id: 'dig', nombre: 'Competencias digitales', semestre: 1 },
-      { id: 'hist', nombre: 'Historiografía de la Psicología', semestre: 1 },
+    const subjects = [
+      { name: 'Cátedra 1', semester: 1 },
+      { name: 'Competencias comunicativas', semester: 1 },
+      { name: 'Epistemologia', semester: 1 },
+      { name: 'Maternáticas Básicas', semester: 1 },
+      { name: 'Competencias digitales', semester: 1 },
+      { name: 'Historiografia de la Psicologia', semester: 1 },
 
-      { id: 'arg', nombre: 'Argumentación y Producción de textos', semestre: 2, req: ['com'] },
-      { id: 'ant', nombre: 'Antropología Social y Cultural', semestre: 2 },
-      { id: 'est', nombre: 'Estadística Descriptiva', semestre: 2, req: ['mat'] },
-      { id: 'ing1', nombre: 'Inglés I', semestre: 2 },
-      { id: 'neuro1', nombre: 'Neurociencia Social', semestre: 2 },
-      { id: 'proc1', nombre: 'Procesos Psicológicos', semestre: 2 },
+      { name: 'Argumentación y Producción de textos', semester: 2 },
+      { name: 'Antropologia Social y Cultural', semester: 2 },
+      { name: 'Estadistica Descriptiva', semester: 2, requires: ['Maternáticas Básicas'] },
+      { name: 'inglés', semester: 2 },
+      { name: 'Neurociencia Social', semester: 2 },
+      { name: 'Procesos Psicológicos', semester: 2 },
 
-      { id: 'bio', nombre: 'Bioética', semestre: 3 },
-      { id: 'ing2', nombre: 'Inglés II', semestre: 3, req: ['ing1'] },
-      { id: 'div', nombre: 'Divergencias Sociales Globales', semestre: 3 },
-      { id: 'elec1', nombre: 'Electiva Profesional I', semestre: 3 },
-      { id: 'prog', nombre: 'Fundamentos de Programación', semestre: 3 },
-      { id: 'neuro2', nombre: 'Neurociencia Cognitiva Aplicada', semestre: 3, req: ['neuro1'] },
-      { id: 'progInv1', nombre: 'Programas de Investigación I', semestre: 3 },
+      { name: 'Bioética', semester: 3 },
+      { name: 'Ingles 2', semester: 3, requires: ['inglés'] },
+      { name: 'Divergencias Sociales Globales y Latinoamericanas', semester: 3 },
+      { name: 'Electiva Profesional', semester: 3 },
+      { name: 'Fundamentos de Programación', semester: 3 },
+      { name: 'Neurociencia Cognitive Aplicada', semester: 3, requires: ['Neurociencia Social'] },
+      { name: 'Programas de Investigación en Psicologia', semester: 3 },
 
-      { id: 'ing3', nombre: 'Inglés III', semestre: 4, req: ['ing2'] },
-      { id: 'pens', nombre: 'Pensamiento Político y Económico', semestre: 4 },
-      { id: 'fin', nombre: 'Finanzas', semestre: 4 },
-      { id: 'compInv', nombre: 'Competencias Investigativas', semestre: 4 },
-      { id: 'gest', nombre: 'Gestión Digital e Innovación', semestre: 4 },
-      { id: 'progInv2', nombre: 'Programas de Investigación II', semestre: 4, req: ['progInv1'] },
-      { id: 'psicom', nombre: 'Psicometría', semestre: 4, req: ['est'] },
+      { name: 'Ingles III', semester: 4, requires: ['Ingles 2'] },
+      { name: 'Pensamiento Politico y Económico', semester: 4 },
+      { name: 'Finanzas', semester: 4 },
+      { name: 'Competencias Investigativas', semester: 4 },
+      { name: 'Gestión Digital e Innovación', semester: 4 },
+      { name: 'Programas de Investigación en Psicologia il', semester: 4, requires: ['Programas de Investigación en Psicologia'] },
+      { name: 'Psicometria', semester: 4 },
 
-      { id: 'cat2', nombre: 'Cátedra II', semestre: 5 },
-      { id: 'psysoc', nombre: 'Psicología y Sociedad', semestre: 5 },
-      { id: 'ing4', nombre: 'Inglés IV', semestre: 5, req: ['ing3'] },
-      { id: 'disInv', nombre: 'Diseños Investigativos', semestre: 5 },
-      { id: 'apr', nombre: 'Teorías de Aprendizaje', semestre: 5 },
-      { id: 'dev', nombre: 'Psicología del Desarrollo', semestre: 5 },
+      { name: 'Cátedra II', semester: 5 },
+      { name: 'Psicologia y Sociedad', semester: 5 },
+      { name: 'Inglés IV', semester: 5, requires: ['Ingles III'] },
+      { name: 'Diseños Investigativos en Psicologia', semester: 5 },
+      { name: 'Teorias de Aprendizaje Asociativo', semester: 5 },
+      { name: 'Psicologia del Desarrollo', semester: 5 },
 
-      { id: 'ing5', nombre: 'Inglés V', semestre: 6, req: ['ing4'] },
-      { id: 'invSoc', nombre: 'Investigación Social', semestre: 6 },
-      { id: 'pers', nombre: 'Teorías de Personalidad', semestre: 6 },
-      { id: 'jur', nombre: 'Psicología Jurídica', semestre: 6 },
-      { id: 'eval', nombre: 'Evaluación Psicológica', semestre: 6 },
-      { id: 'psicoPat', nombre: 'Psicopatología', semestre: 6 },
+      { name: 'inglés V', semester: 6, requires: ['Inglés IV'] },
+      { name: 'Investigación Social', semester: 6 },
+      { name: 'Teorias de Personalidad', semester: 6 },
+      { name: 'Psicologia Juridica', semester: 6 },
+      { name: 'Evaluación Psicológica', semester: 6 },
+      { name: 'Psicopatologia', semester: 6 },
 
-      { id: 'elecInt', nombre: 'Electiva Integral', semestre: 7 },
-      { id: 'ing6', nombre: 'Inglés VI', semestre: 7, req: ['ing5'] },
-      { id: 'dir', nombre: 'Dirección y Gestión de Proyectos 2', semestre: 7 },
-      { id: 'disInv2', nombre: 'Diseños Investigativos 2', semestre: 7, req: ['disInv'] },
-      { id: 'trab', nombre: 'Psicología del Trabajo', semestre: 7 },
-      { id: 'clin1', nombre: 'Psicología Clínica y de la Salud', semestre: 7 },
-      { id: 'org', nombre: 'Psicología Organizacional', semestre: 7 },
+      { name: 'Elective Integral', semester: 7 },
+      { name: 'Inglés VI', semester: 7, requires: ['inglés V'] },
+      { name: 'Dirección y Gestión de Proyectos 2', semester: 7 },
+      { name: 'Sociales', semester: 7 },
+      { name: 'Diseños y Métodos Investigativos 2', semester: 7 },
+      { name: 'en Psicologia II', semester: 7 },
+      { name: 'del Trabajo', semester: 7 },
+      { name: 'Psicologia Clinica y de la Salud', semester: 7 },
+      { name: 'Psicologia Organizacional', semester: 7 },
 
-      { id: 'cat3', nombre: 'Cátedra III', semestre: 8 },
-      { id: 'procInv', nombre: 'Procesos Investigativos', semestre: 8 },
-      { id: 'profClin', nombre: 'Profundización Clínica', semestre: 8, req: ['clin1'] },
-      { id: 'edu', nombre: 'Psicología Educativa y Desarrollo Humano', semestre: 8 },
-      { id: 'socAmb', nombre: 'Psicología Social y Comunitaria', semestre: 8 },
+      { name: 'Cátedra III', semester: 8 },
+      { name: 'Procesos investigativos', semester: 8 },
+      { name: 'Profundización Psicologia Clinicay de la Salud', semester: 8 },
+      { name: 'Psicologia Educativa, Desarrollo Humano y Ciclo de Vida', semester: 8 },
+      { name: 'Psicologia Social, Ambiental y Comunitaria', semester: 8 },
 
-      { id: 'elec2', nombre: 'Electiva Profesional II', semestre: 9 },
-      { id: 'apr2', nombre: 'Otras Teorías del Aprendizaje', semestre: 9 },
-      { id: 'practClin', nombre: 'Práctica Clínica y de la Salud', semestre: 9, req: ['profClin'] },
-      { id: 'otrosCont', nombre: 'Profundización en Otros Contextos', semestre: 9 },
+      { name: 'Electiva Profesional II', semester: 9 },
+      { name: 'Otras Aproximaciones Teóricas del Aprendizaje', semester: 9 },
+      { name: 'Práctica Psicologia Clinica y de la Salud', semester: 9 },
+      { name: 'Profundización en Otros Contextos', semester: 9 },
 
-      { id: 'grado', nombre: 'Opción de Grado', semestre: 10 },
-      { id: 'practOtros', nombre: 'Práctica en Otros Contextos', semestre: 10 },
+      { name: 'Opción de Grado', semester: 10 },
+      { name: 'Práctica Otros Contextos', semester: 10 },
     ];
 
-    const progreso = JSON.parse(localStorage.getItem('progresoPsicoUBA') || '{}');
+    const malla = document.getElementById('malla');
+    const state = JSON.parse(localStorage.getItem('aprobadas') || '{}');
 
-    function crearMalla() {
-      const container = document.getElementById('malla');
-      for (let i = 1; i <= 10; i++) {
-        const col = document.createElement('div');
-        col.className = 'semestre';
-        col.innerHTML = `<h2>Semestre ${i}</h2>`;
-        materias.filter(m => m.semestre === i).forEach(materia => {
+    const checkDependencies = (subject) =>
+      !subject.requires || subject.requires.every(req => state[req]);
+
+    function render() {
+      malla.innerHTML = '';
+
+      for (let sem = 1; sem <= 10; sem++) {
+        const column = document.createElement('div');
+        column.className = 'semester';
+        const header = document.createElement('h2');
+        header.textContent = `${sem}º semestre`;
+        column.appendChild(header);
+
+        subjects.filter(s => s.semester === sem).forEach(subject => {
           const el = document.createElement('div');
-          el.className = 'materia';
-          el.textContent = materia.nombre;
-          el.dataset.id = materia.id;
-          if (progreso[materia.id]) el.classList.add('aprobada');
-          col.appendChild(el);
+          el.textContent = subject.name;
+          el.className = 'subject';
+
+          const fulfilled = checkDependencies(subject);
+          if (!fulfilled) {
+            el.classList.add('locked');
+            el.setAttribute('data-tooltip', 'Requiere: ' + subject.requires.join(', '));
+          } else {
+            el.addEventListener('click', () => {
+              state[subject.name] = !state[subject.name];
+              localStorage.setItem('aprobadas', JSON.stringify(state));
+              render();
+            });
+          }
+
+          if (state[subject.name]) el.classList.add('completed');
+          column.appendChild(el);
         });
-        container.appendChild(col);
+
+        malla.appendChild(column);
       }
     }
 
-    function actualizarEstado() {
-      document.querySelectorAll('.materia').forEach(el => {
-        const id = el.dataset.id;
-        const mat = materias.find(m => m.id === id);
-        el.classList.remove('bloqueada');
-        el.removeAttribute('title');
-        if (mat.req) {
-          const noCumple = mat.req.filter(req => !progreso[req]);
-          if (noCumple.length > 0) {
-            el.classList.add('bloqueada');
-            el.title = 'Requiere: ' + noCumple.map(id => materias.find(m => m.id === id).nombre).join(', ');
-          }
-        }
-      });
-    }
-
-    function toggleMateria(el) {
-      const id = el.dataset.id;
-      const mat = materias.find(m => m.id === id);
-      if (el.classList.contains('bloqueada')) return;
-      el.classList.toggle('aprobada');
-      progreso[id] = el.classList.contains('aprobada');
-      localStorage.setItem('progresoPsicoUBA', JSON.stringify(progreso));
-      actualizarEstado();
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      crearMalla();
-      actualizarEstado();
-      document.querySelectorAll('.materia').forEach(el => {
-        el.addEventListener('click', () => toggleMateria(el));
-      });
-    });
+    render();
   </script>
 </body>
 </html>
